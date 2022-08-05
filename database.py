@@ -1,10 +1,7 @@
 from deta import Deta
-import os
-from dotenv import load_dotenv
+import streamlit as st
 
-load_dotenv('.env')
-
-DETA_KEY = os.getenv("DETA_KEY_1")
+DETA_KEY = st.secrets["DETA_KEY_1"]
 
 deta = Deta(DETA_KEY)
 
