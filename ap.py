@@ -34,58 +34,49 @@ if authentication_status:
             self.run()
 
         def run(self):
-            st.title("R*C*")
-                       
+            st.title("🚀")  
 
-            with st.sidebar:
+            date = st.date_input('Date')
+            date = str(date)
+            data = db.get_record(date)
+            data = pd.DataFrame(data, index=[0])
+                    
+            try:
+                st.metric(label="RCs", value=data.rcs)
+            except:
+                st.metric(label="RCs", value=0)
+        
+            #st.write(data) 
 
-                st.header('Add to Log')
+            col1, col2  = st.columns(2)
 
-                date = st.date_input('Date')
-                date = str(date)
-                data = db.get_record(date)
-                data = pd.DataFrame(data, index=[0])
-                           
-                try:
-                    st.metric(label="RCs", value=data.rcs)
-                except:
-                    st.metric(label="RCs", value=0)
-                
-                #st.write(data) 
+            with col1:                
+                if st.button("  -1  "):
+                    st.session_state["rc"] -=1
+            
+            with col2:
+                if st.button("+1"):
+                    st.session_state["rc"] +=1
+                    
+            st.write(self.rc)
 
-                col1, col2 = st.columns(2)
-
-                with col1:
-                    if st.button("-1"):
-                        st.session_state["rc"] = st.session_state["rc"] - 1
-
-                with col2:
-                    if st.button("+1"):
-                        st.session_state["rc"] = st.session_state["rc"] + 1
-                      
-                st.write(self.rc)
-
-                new_data = {
-                    "key": date,
-                    "rcs": self.rc
-                }
-
-                if st.button("Submit"):
-                    db.insert_record(new_data["key"], new_data["rcs"])
+            if st.button("Submit"):
+                db.insert_record(date, self.rc)
 
             #st.metric(label="Date", value=date)
-            
-            # fetch data
+        
+        # fetch data
 
             all_data = db.fetch_all()
             all_data = pd.DataFrame(all_data)
 
             all_data[['rcs']] = all_data[['rcs']].apply(pd.to_numeric)
 
-            st.write(all_data)
             all_data = all_data.set_index("key")
 
             st.line_chart(data=all_data)
+
+            st.write(all_data)
 
             #df = pd.DataFrame(new_data, index=[0])
             # st.write(df)  
